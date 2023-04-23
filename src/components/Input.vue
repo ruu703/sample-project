@@ -17,7 +17,6 @@ const todoList = computed(() => {
   return lists.value.filter((val) => !val.isChecked)
 })
 const deleteList = (id) => {
-  console.log(id)
   lists.value = lists.value.filter((val) => {
     val.delete = false
     return id != val.id && !val.delete
@@ -48,7 +47,7 @@ const ResetList = () => {
         <button class="w-[calc((100%*1/6)-12px)] ml-3 h-14 p-1" @click="ResetList">Reset</button>
       </div>
       <ul class="divide-y divide-cyan-100 bg-sky-200 rounded shadow-lg relative w-full">
-        <TransitionGroup mode="out-in">
+        <TransitionGroup>
           <li
             class="w-full text-left h-14 py-2 px-6 align-middle flex justify-between items-center"
             v-for="list in todoList"
