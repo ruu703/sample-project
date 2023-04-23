@@ -36,8 +36,7 @@ import TodoList from './views/TodoList.vue'
     }
 
     button {
-      @apply rounded
-      p-4 h-14;
+      @apply rounded;
     }
   }
 }

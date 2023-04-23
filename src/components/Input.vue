@@ -16,13 +16,17 @@ const addNewList = () => {
 const todoList = computed(() => {
   return lists.value.filter((val) => !val.isChecked)
 })
-// const deleteList = (id) => {
-//   console.log(id)
-//   lists.value = lists.value.filter((val) => {
-//     val.delete = false
-//     return id != val.id && !val.delete
-//   })
-// }
+const deleteList = (id) => {
+  console.log(id)
+  lists.value = lists.value.filter((val) => {
+    val.delete = false
+    return id != val.id && !val.delete
+  })
+}
+const ResetList = () => {
+  lists.value = []
+  input.value = ''
+}
 // const doneList = computed(() => {
 //   return lists.value.filter((val) => val.isChecked)
 // })
@@ -33,8 +37,15 @@ const todoList = computed(() => {
     <div class="container">
       <h1 class="container__title">TODO LIST</h1>
       <div class="container__list text-left">
-        <input type="text" id="katakana" v-model="input" class="w-5/6 shadow-lg" />
-        <button class="w-[calc((100%*1/6)-12px)] ml-3" @click="addNewList">submit</button>
+        <input
+          type="text"
+          id="katakana"
+          v-model="input"
+          class="w-2/3 shadow-lg"
+          @keypress.enter="addNewList"
+        />
+        <button class="w-[calc((100%*1/6)-12px)] ml-3 h-14 p-1" @click="addNewList">submit</button>
+        <button class="w-[calc((100%*1/6)-12px)] ml-3 h-14 p-1" @click="ResetList">Reset</button>
       </div>
       <ul class="divide-y divide-cyan-100 bg-sky-200 rounded shadow-lg relative w-full">
         <TransitionGroup mode="out-in">
@@ -67,7 +78,8 @@ const todoList = computed(() => {
               >{{ list.text }}</span
             >
 
-            <font-awesome-icon :icon="['fas', 'trash']" @click="deleteList(list.id)" />
+            <!-- <font-awesome-icon :icon="['fas', 'trash']" @click="deleteList(list.id)" /> -->
+            <button @click="deleteList(list.id)" class="p-0.5 w-[100px]">削除</button>
           </li>
         </TransitionGroup>
       </ul>
@@ -133,7 +145,7 @@ input[type='text'] {
   bg-sky-300;
 }
 .v-enter-active {
-  transition: opacity 1s ease;
+  transition: opacity 0.3s ease;
 }
 
 .v-enter-from {
@@ -141,7 +153,7 @@ input[type='text'] {
 }
 
 .v-leave-active {
-  transition: opacity 1s ease;
+  transition: opacity 0.2s ease;
 }
 
 .v-leave-to {
