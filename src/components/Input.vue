@@ -2,33 +2,43 @@
 import { ref, computed } from 'vue'
 
 const input = ref('')
-const lists = ref([])
+
+const lists = ref(localStorage.getItem('lists') ? JSON.parse(localStorage.getItem('lists')) : [])
+
 const addNewList = () => {
   if (!input.value) return
   lists.value.push({
     id: lists.value.length + 1,
     text: input.value,
     isChecked: false,
-    delete: false
+    delete: false,
+    focus: false
   })
+  setLocalStorage()
   input.value = ''
 }
+
 const todoList = computed(() => {
   return lists.value.filter((val) => !val.isChecked)
 })
+
 const deleteList = (id) => {
   lists.value = lists.value.filter((val) => {
     val.delete = false
     return id != val.id && !val.delete
   })
+  setLocalStorage()
 }
+
 const ResetList = () => {
   lists.value = []
   input.value = ''
+  localStorage.removeItem('lists')
 }
-// const doneList = computed(() => {
-//   return lists.value.filter((val) => val.isChecked)
-// })
+
+const setLocalStorage = () => {
+  localStorage.setItem('lists', JSON.stringify(lists.value))
+}
 </script>
 
 <template>
@@ -53,71 +63,27 @@ const ResetList = () => {
             v-for="list in todoList"
             :key="list.id"
           >
-            <label>
-              <input type="checkbox" class="hidden" v-model="list.isChecked" />
-              <!-- <font-awesome-icon :icon="['far', 'circle']" size="lg" v-show="!list.isChecked" />
-              <font-awesome-icon
-                :icon="['fas', 'circle-check']"
-                size="lg"
-                v-show="list.isChecked"
-              /> -->
-            </label>
-
             <input
               type="text"
               v-model="list.text"
-              v-if="list.delete"
-              class="bg-transparent border-0 ml-2 pr-4 outline-none w-full"
-              @mouseleave="list.delete = false"
+              v-if="list.focus"
+              class="bg-transparent border-0 pr-4 outline-none w-full"
+              @keyup.enter.shift="list.focus = false"
             />
             <span
-              :class="['overflow-auto px-4 ml-2 w-full', { 'line-through': list.isChecked }]"
-              @mouseover="!list.isChecked ? (list.delete = true) : ''"
-              v-else-if="!list.delete"
+              :class="['overflow-auto px-4 w-full', { 'line-through': list.isChecked }]"
+              @mouseover="list.focus = true"
+              v-else-if="!list.focus"
               >{{ list.text }}</span
             >
-
-            <!-- <font-awesome-icon :icon="['fas', 'trash']" @click="deleteList(list.id)" /> -->
-            <button @click="deleteList(list.id)" class="p-0.5 w-[100px]">削除</button>
+            <font-awesome-icon
+              :icon="['fas', 'trash-can']"
+              @click="deleteList(list.id)"
+              class="hover:scale-125 duration-150 cursor-pointer"
+            />
           </li>
         </TransitionGroup>
       </ul>
-      <!-- <h2 class="py-6">DONE</h2>
-      <ul class="divide-y divide-cyan-100 bg-sky-200 rounded shadow-lg relative w-full">
-        <TransitionGroup mode="out-in">
-          <li
-            class="w-full text-left h-14 py-2 px-6 align-middle flex justify-between items-center"
-            v-for="list in doneList"
-            :key="list.id"
-          >
-            <div class="w-full">
-              <label>
-                <input type="checkbox" class="hidden" v-model="list.isChecked" />
-                <font-awesome-icon :icon="['far', 'circle']" size="lg" v-show="!list.isChecked" />
-                <font-awesome-icon
-                  :icon="['fas', 'circle-check']"
-                  size="lg"
-                  v-show="list.isChecked"
-                />
-              </label>
-              <input
-                type="text"
-                v-model="list.text"
-                v-if="list.delete"
-                class="w-[60%] bg-transparent border-0 ml-2 outline-none"
-                @mouseleave="list.delete = false"
-              />
-              <span
-                :class="['overflow-auto w-full pl-4 ml-2', { 'line-through': list.isChecked }]"
-                @mouseover="!list.isChecked ? (list.delete = true) : ''"
-                v-else-if="!list.delete"
-                >{{ list.text }}</span
-              >
-            </div>
-            <font-awesome-icon :icon="['fas', 'trash']" @click="deleteList(list.id)" />
-          </li>
-        </TransitionGroup>
-      </ul> -->
     </div>
   </div>
 </template>
@@ -144,7 +110,7 @@ input[type='text'] {
   bg-sky-300;
 }
 .v-enter-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
 }
 
 .v-enter-from {
